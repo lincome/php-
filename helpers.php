@@ -860,3 +860,26 @@ function colorRand(){
     $color = "#".$color;
     return $color;
 }
+
+/**
+ * 取得客户端的IP
+ *
+ * @return string
+ */
+function get_client_ip() {
+    $ip = null;
+    if (!empty($_SERVER['REMOTE_ADDR'])) {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    } else {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (!empty($_SERVER['HTTP_VIA '])) {
+            $ip = $_SERVER['HTTP_VIA '];
+        } else {
+            $ip = 'Unknown';
+        }
+    }
+    return $ip;
+}
