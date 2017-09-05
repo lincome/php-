@@ -825,11 +825,12 @@ function output($err_code, $data)
 
 /**
  *  概率算法
- * @param a奖概率20%，b奖概率30%，c奖概率50%
+ * @param a奖概率20 %，b奖概率30%，c奖概率50%
  * @param $proArr = ['a'=>20,'b'=>30,'c'=>50]
  * @return a || b || c
  */
-function get_rand($proArr) {
+function get_rand($proArr)
+{
     $result = '';
     //概率数组的总概率精度
     $proSum = array_sum($proArr);
@@ -848,16 +849,18 @@ function get_rand($proArr) {
 }
 
 //打印调试
-function P($array){
+function P($array)
+{
     echo "<pre>";
     print_r($array);
     echo "</pre>";
 }
 
-function colorRand(){
+function colorRand()
+{
     //$color = dechex(rand(3355443,13421772));
-    $color = dechex(rand(1048576,16777215));
-    $color = "#".$color;
+    $color = dechex(rand(1048576, 16777215));
+    $color = "#" . $color;
     return $color;
 }
 
@@ -866,7 +869,8 @@ function colorRand(){
  *
  * @return string
  */
-function get_client_ip() {
+function get_client_ip()
+{
     $ip = null;
     if (!empty($_SERVER['REMOTE_ADDR'])) {
         $ip = $_SERVER['REMOTE_ADDR'];
@@ -882,4 +886,87 @@ function get_client_ip() {
         }
     }
     return $ip;
+}
+
+/**
+ * 清空缓存
+ */
+function cacheClear()
+{
+    cache()->flush();
+}
+
+/**
+ * 判断是否汉字
+ *
+ * @param string $str
+ * @return int
+ */
+function is_hanzi($str) {
+    return preg_match('%^(?:
+          [\xC2-\xDF][\x80-\xBF]            # non-overlong 2-byte
+        | \xE0[\xA0-\xBF][\x80-\xBF]        # excluding overlongs
+        | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2} # straight 3-byte
+        | \xED[\x80-\x9F][\x80-\xBF]        # excluding surrogates
+        | \xF0[\x90-\xBF][\x80-\xBF]{2}     # planes 1-3
+        | [\xF1-\xF3][\x80-\xBF]{3}         # planes 4-15
+        | \xF4[\x80-\x8F][\x80-\xBF]{2}     # plane 16
+        )*$%xs', $str);
+}
+
+/**
+ * 随机字符串
+ *
+ * @param int $length
+ * @param string $charlist
+ * @return string
+ */
+function str_rand($length = 6, $charlist = '0123456789abcdefghijklmnopqrstopwxyz') {
+    $charcount = strlen($charlist);
+    $str = null;
+    for ($i = 0; $i < $length; $i++) {
+        $str .= $charlist[mt_rand(0, $charcount - 1)];
+    }
+    return $str;
+}
+
+/**
+ * 格式化大小
+ *
+ * @param int $bytes
+ * @return string
+ */
+function format_size($bytes) {
+    if ($bytes == 0) return '-';
+    $bytes = floatval($bytes);
+    $units = array('Bytes', 'KB', 'MB', 'GB', 'TB', 'PB');
+    $i = 0;
+    while ($bytes >= 1024) {
+        $bytes /= 1024;
+        $i++;
+    }
+    $precision = $i == 0 ? 0 : 2;
+    return number_format(round($bytes, $precision), $precision) . $units[$i];
+}
+
+/**
+ * 删除文件夹
+ *
+ * @param string $path 要删除的文件夹路径
+ * @return bool
+ */
+function rmdirs($path) {
+    $error_level = error_reporting(0);
+    if ($dh = opendir($path)) {
+        while (false !== ($file = readdir($dh))) {
+            if ($file != '.' && $file != '..') {
+                $file_path = $path . '/' . $file;
+                is_dir($file_path) ? rmdirs($file_path) : unlink($file_path);
+            }
+        }
+        closedir($dh);
+    }
+    $result = rmdir($path);
+    error_reporting($error_level);
+    return $result;
 }
