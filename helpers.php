@@ -393,13 +393,14 @@ function lastSql()
 
 /**
  * 数组排序
+ * 如果你的数组如果是字符串键名将被保留,但是数字键将被重新索引,从0开始,并以1递增。
  * @param $arrays
  * @param $sort_key
  * @param int $sort_order
  * @param int $sort_type
  * @return array|bool
  */
-function my_sort($arrays, $sort_key, $sort_order = SORT_ASC, $sort_type = SORT_NUMERIC)
+function string_my_sort($arrays, $sort_key, $sort_order = SORT_ASC, $sort_type = SORT_NUMERIC)
 {
     if (is_array($arrays)) {
         foreach ($arrays as $array) {
@@ -414,6 +415,38 @@ function my_sort($arrays, $sort_key, $sort_order = SORT_ASC, $sort_type = SORT_N
     }
     array_multisort($key_arrays, $sort_order, $sort_type, $arrays);
     return $arrays;
+}
+
+/**
+ * 二维数组保持键值不变排序
+ * @param $array
+ * @param $keys
+ * @param string $type asc|des
+ * @return array|bool
+ */
+function array_sort_help($array, $keys, $type = 'asc')
+{
+    if (!is_array($array)) {
+        return false;
+    }
+    //$array为要排序的数组,$keys为要用来排序的键名,$type默认为升序排序
+    $keysvalue = $new_array = array();
+    foreach ($array as $k => $v) {
+        if (!isset($v[$keys])) {
+            return false;
+        }
+        $keysvalue[$k] = $v[$keys];
+    }
+    if ($type == 'asc') {
+        asort($keysvalue);
+    } else {
+        arsort($keysvalue);
+    }
+    reset($keysvalue);
+    foreach ($keysvalue as $k => $v) {
+        $new_array[$k] = $array[$k];
+    }
+    return $new_array;
 }
 
 /**
